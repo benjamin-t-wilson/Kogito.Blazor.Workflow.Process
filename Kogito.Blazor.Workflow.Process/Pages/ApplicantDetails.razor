@@ -1,0 +1,68 @@
+﻿@page "/applicants/{ID}"
+
+@if (_Applicant != null && _Tasks != null && !string.IsNullOrWhiteSpace(ID))
+{
+    <h3>ApplicantDetails</h3>
+    <ul>
+        <li>Name: @_Applicant.applicant.name</li>
+        <li>Credit score: @_Applicant.applicant.creditScore</li>
+        <li>Approval status: @_Applicant.applicant.approved</li>
+        <li>Id: @_Applicant.id</li>
+    </ul>
+    <h3>Tasks</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Id</th>
+                <th>Status</th>
+                <th>Skippable</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in _Tasks)
+            {
+                <tr>
+                    <td>@task.name</td>
+                    <td>@task.id</td>
+                    <td>@task.phaseStatus</td>
+                    <td>@task.parameters.Skippable</td>
+                    <td><button @onclick="() => CompleteTask(task.name, task.id)">✔</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@inject IApplicantRepository _applicantRepository
+@inject NavigationManager _navManager
+
+@code {
+    public ApplicantWithId _Applicant { get; set; }
+    public List<ApplicantTask> _Tasks { get; set; }
+
+    [Parameter]
+    public string ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _Applicant = await _applicantRepository.GetApplicantById(ID);
+
+        _Tasks = new List<ApplicantTask>();
+        _Tasks.AddRange(await _applicantRepository.GetApplicantsTaskList(ID));
+
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async Task CompleteTask(string taskName, string taskId)
+    {
+        await _applicantRepository.CompleteTask(ID, taskName, taskId);
+        _navManager.NavigateTo("/applicants");
+    }
+}

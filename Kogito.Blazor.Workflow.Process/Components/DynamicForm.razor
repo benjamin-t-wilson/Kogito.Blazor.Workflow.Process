@@ -1,0 +1,107 @@
+﻿<section class="dynamicForm @nameof(DynamicClass)">
+    <form @onsubmit="HandleSubmit" @onsubmit:preventDefault>
+        @{
+            foreach (var prop in DynamicClass.GetType().GetProperties())
+            {
+                <label for="@prop.Name">Property Name: @prop.Name</label>
+                <label>Property Type Name: @prop.PropertyType.Name</label>
+                <input name="@prop.Name" value="@DynamicValues[prop.Name].ToString()" @onchange="@((e) => HandleChange(e, prop.Name))" type="@InputType(prop.PropertyType.Name)" step="@StepAttribute(prop.PropertyType.Name)" required="@Required(prop.Name)" />
+                // the reason for using value and onchange instead of simply @bind is because
+                // @bind does not support the automatic changing of a string (all input values are technically strings
+                // to object, which we must have for our mapper to work without custom profiles
+            }
+        }
+        <button type="submit">Submit</button>
+    </form>
+</section>
+
+@typeparam T
+@inject IMapper _mapper
+
+@code {
+    [Parameter]
+    public T DynamicClass { get; set; }
+    [Parameter]
+    public Action<T> ParentHandleSubmit { get; set; }
+
+    private Dictionary<string, object> DynamicValues;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        DynamicValues = new Dictionary<string, object>();
+
+        foreach (var prop in DynamicClass.GetType().GetProperties())
+        {
+            var propType = DynamicClass.GetType().GetProperty(prop.Name).PropertyType;
+
+            if (propType.Name.Contains("String", StringComparison.InvariantCultureIgnoreCase))
+            {
+                DynamicValues.Add(prop.Name, string.Empty); //system.string has no parameterless constructor
+            }
+            else
+            {
+                DynamicValues.Add(prop.Name, Activator.CreateInstance(propType));
+            }
+        }
+    }
+
+    private string InputType(string propertyTypeName)
+    {
+        switch (propertyTypeName)
+        {
+            case "Boolean":
+                return "checkbox";
+
+            case "Decimal":
+            case "Double":
+            case "Single":
+            case "Int32":
+            case "Int64":
+            case "Int16":
+                return "number";
+
+            case "DateTime":
+                return "datetime-local";
+
+            default:
+                return "text";
+        }
+    }
+
+    private string StepAttribute(string propertyTypeName)
+    {
+        switch (propertyTypeName)
+        {
+            case "Decimal":
+            case "Double":
+            case "Single":
+                return "0.01";
+
+            default:
+                return "1";
+        }
+    }
+
+    private bool Required(string propertyName)
+    {
+        var type = typeof(T);
+        var propertyInfo = type.GetProperty(propertyName);
+        var isRequired = Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute));
+
+        return isRequired;
+    }
+
+    private void HandleSubmit()
+    {
+        DynamicClass = _mapper.Map<T>(DynamicValues);
+        //automapper can turn Dictionary<string, object> into any class without a profile
+
+        ParentHandleSubmit(DynamicClass);
+    }
+
+    private void HandleChange(ChangeEventArgs e, string propertyName)
+    {
+        DynamicValues[propertyName] = e.Value;
+    }
+}

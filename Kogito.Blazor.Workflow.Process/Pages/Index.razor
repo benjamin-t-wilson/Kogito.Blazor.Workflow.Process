@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<h1>Kogito Applicant Process</h1>
+<p>The DynamicForm component accepts a generic class (type T) and will dynamically spit out a form label and input with appropriate input type for all properties on the class</p>
+<p>In the parent, we are responsible for creating the class, and handling the submission of the form. For the sake of this example, all I am doing with the information is updating the code block below, which simply contains the JSON string of the class.</p>
+<p>In this example, we are providing our dynamic form component with the NewApplicant class to generate a form for us to post an applicant to our kogito service.</p>
+<h3>Current submission status is: @Status</h3>
+
+<DynamicForm DynamicClass="@NewApplicant" ParentHandleSubmit="@PostNewApplicant" />
+
+@inject IApplicantRepository _applicantRepository;
+
+@code{
+    public NewApplicant NewApplicant { get; set; }
+    public string Status { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        NewApplicant = new NewApplicant();
+        Status = "Not submitted";
+    }
+
+    private async void PostNewApplicant(NewApplicant newApplicant)
+    {
+        NewApplicant = newApplicant;
+        var result = await _applicantRepository.PostNewApplicant(newApplicant);
+        Status = $"Successful! New applicant ID is -- {result.id}";
+
+        StateHasChanged();
+    }
+}

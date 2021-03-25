@@ -1,0 +1,40 @@
+﻿@page "/applicants"
+
+<h3>Applicants List</h3>
+<p>Below we see a list of all applicants. Click an applicant ID to see any open tasks for them.</p>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Credit Score</th>
+            <th>Approval Status</th>
+            <th>ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var applicant in _Applicants)
+        {
+            <tr>
+                <td>@applicant.applicant.name</td>
+                <td>@applicant.applicant.creditScore</td>
+                <td>@applicant.applicant.approved</td>
+                <td><a href="/applicants/@applicant.id">@applicant.id</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@inject IApplicantRepository _applicantRepository
+
+@code {
+    public List<ApplicantWithId> _Applicants { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _Applicants = new List<ApplicantWithId>();
+
+        _Applicants.AddRange(await _applicantRepository.GetApplicantsList());
+
+        await base.OnInitializedAsync();
+    }
+}
