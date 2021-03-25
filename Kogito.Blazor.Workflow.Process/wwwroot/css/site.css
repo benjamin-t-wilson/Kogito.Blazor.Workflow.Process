@@ -1,3 +1,46 @@
+html {
+    overflow: hidden;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+}
+
+app {
+    display: flex;
+    height: 100%;
+}
+
+.main {
+    width: 100%;
+    overflow: auto;
+    padding-right: 30px;
+    padding-bottom: 30px;
+}
+
+nav {
+    width: 175px;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    background: #D71E2B;
+    border-right: 5px solid #FCC60A;
+    margin-right: 30px;
+    height: 100%;
+}
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin: 15px 0;
+        font-size: 18px;
+    }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
 h1 {
     padding-bottom: 10px;
     border-bottom: 1px solid lightgray;
@@ -8,35 +51,64 @@ p {
     max-width: 500px;
 }
 
-ul {
-    list-style: none;
-    background: lightgray;
-    padding: 20px;
-    max-width: 500px;
-}
-
-li {
-    margin: 10px 20px;
-}
-
-    li:first-child, li:last-child {
-        margin: 10px 0;
-    }
-
 form {
     display: flex;
     flex-direction: column;
+    background: #FFF7E2;
+    padding: 20px;
+    max-width: 340px;
 }
 
 input {
     padding: 5px 10px;
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     max-width: 300px;
 }
 
 button {
-    width: 100px;
+    max-width: 324px;
     margin: 10px 0;
     font-size: 18px;
+    background: #D71E28;
+    color: white;
+    border: 0;
+    padding: 10px 20px;
+}
+
+    button:hover {
+        cursor: pointer;
+        text-decoration: underline;
+        background: #C11B26;
+    }
+
+label {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+table {
+    max-width: 800px;
+    border-spacing: 0 5px;
+    padding: 0 30px 30px;
+    background: #FFF7E2;
+}
+
+th, td {
+    letter-spacing: 1px;
+    width: 15%;
+    border: 0;
+    padding: 15px 0;
+}
+
+th {
+    font-size: 20px;
+}
+
+tbody td {
+    text-align: center;
+}
+
+tbody tr:nth-child(even), thead {
+    background: #E5DECB;
 }

@@ -3,8 +3,7 @@
         @{
             foreach (var prop in DynamicClass.GetType().GetProperties())
             {
-                <label for="@prop.Name">Property Name: @prop.Name</label>
-                <label>Property Type Name: @prop.PropertyType.Name</label>
+                <label for="@prop.Name">@prop.Name.ToSentenceCase()</label>
                 <input name="@prop.Name" value="@DynamicValues[prop.Name].ToString()" @onchange="@((e) => HandleChange(e, prop.Name))" type="@InputType(prop.PropertyType.Name)" step="@StepAttribute(prop.PropertyType.Name)" required="@Required(prop.Name)" />
                 // the reason for using value and onchange instead of simply @bind is because
                 // @bind does not support the automatic changing of a string (all input values are technically strings

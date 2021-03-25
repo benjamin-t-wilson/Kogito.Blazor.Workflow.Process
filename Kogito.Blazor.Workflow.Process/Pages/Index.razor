@@ -1,9 +1,13 @@
 ﻿@page "/"
 
 <h1>Kogito Applicant Process</h1>
+
+<img src="./assets/bpmndiagram.png" />
+
 <p>The DynamicForm component accepts a generic class (type T) and will dynamically spit out a form label and input with appropriate input type for all properties on the class</p>
-<p>In the parent, we are responsible for creating the class, and handling the submission of the form. For the sake of this example, all I am doing with the information is updating the code block below, which simply contains the JSON string of the class.</p>
+<p>In the parent, we are responsible for creating the class, and handling the submission of the form.</p>
 <p>In this example, we are providing our dynamic form component with the NewApplicant class to generate a form for us to post an applicant to our kogito service.</p>
+
 <h3>Current submission status is: @Status</h3>
 
 <DynamicForm DynamicClass="@NewApplicant" ParentHandleSubmit="@PostNewApplicant" />
