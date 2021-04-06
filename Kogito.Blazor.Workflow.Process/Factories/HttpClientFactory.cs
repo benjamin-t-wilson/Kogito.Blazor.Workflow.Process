@@ -12,14 +12,14 @@ namespace Kogito.Blazor.Workflow.Process.Factories
         public HttpClientFactory(IConfiguration config)
         {
             _config = config;
-            _baseUrl = _config.GetValue<string>("Kogito:BaseUrl");
+            _baseUrl = _config.GetValue<string>("Kogito_BaseUrl");
         }
 
         public HttpClient CreateClient()
         {
             var client = new HttpClient
             {
-                BaseAddress = new Uri(_baseUrl)
+                BaseAddress = new Uri("http://" + _baseUrl)
             };
 
             return client;

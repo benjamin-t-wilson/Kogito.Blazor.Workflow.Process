@@ -27,7 +27,7 @@ namespace Kogito.Blazor.Workflow.Process.Repositories
             var postBodyAsJson = JsonSerializer.Serialize(postBody);
             var content = new StringContent(postBodyAsJson, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("applicants", content);
+            var response = await _httpClient.PostAsync("ApplicantProcess", content);
             string responseBody = await response.Content.ReadAsStringAsync();
 
             var postResult = JsonSerializer.Deserialize<ApplicantWithId>(responseBody);
@@ -37,7 +37,7 @@ namespace Kogito.Blazor.Workflow.Process.Repositories
 
         public async Task<List<ApplicantWithId>> GetApplicantsList()
         {
-            var response = await _httpClient.GetAsync("applicants");
+            var response = await _httpClient.GetAsync("ApplicantProcess");
             string responseBody = await response.Content.ReadAsStringAsync();
 
             var applicantList = JsonSerializer.Deserialize<List<ApplicantWithId>>(responseBody);
@@ -47,7 +47,7 @@ namespace Kogito.Blazor.Workflow.Process.Repositories
 
         public async Task<ApplicantWithId> GetApplicantById(string id)
         {
-            var response = await _httpClient.GetAsync($"applicants/{id}");
+            var response = await _httpClient.GetAsync($"ApplicantProcess/{id}");
             string responseBody = await response.Content.ReadAsStringAsync();
 
             var applicant = JsonSerializer.Deserialize<ApplicantWithId>(responseBody);
@@ -57,7 +57,7 @@ namespace Kogito.Blazor.Workflow.Process.Repositories
 
         public async Task<List<ApplicantTask>> GetApplicantsTaskList(string id)
         {
-            var response = await _httpClient.GetAsync($"applicants/{id}/tasks");
+            var response = await _httpClient.GetAsync($"ApplicantProcess/{id}/tasks");
             string responseBody = await response.Content.ReadAsStringAsync();
 
             var taskList = JsonSerializer.Deserialize<List<ApplicantTask>>(responseBody);
@@ -72,7 +72,7 @@ namespace Kogito.Blazor.Workflow.Process.Repositories
             var postBodyAsJson = JsonSerializer.Serialize(postBody);
             var content = new StringContent(postBodyAsJson, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"applicants/{applicantId}/{taskName}/{taskId}", content);
+            var response = await _httpClient.PostAsync($"ApplicantProcess/{applicantId}/{taskName}/{taskId}", content);
             string responseBody = await response.Content.ReadAsStringAsync();
 
             var postResult = JsonSerializer.Deserialize<ApplicantWithId>(responseBody);
