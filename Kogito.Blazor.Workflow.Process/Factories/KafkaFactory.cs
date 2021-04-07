@@ -1,4 +1,5 @@
 ﻿using Confluent.Kafka;
+using Kogito.Blazor.Workflow.Process.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Kogito.Blazor.Workflow.Process.Factories
 {
-    public class KafkaFactory
+    public class KafkaFactory : IKafkaFactory
     {
         private readonly IConfiguration _config;
         private readonly string _baseUrl;
