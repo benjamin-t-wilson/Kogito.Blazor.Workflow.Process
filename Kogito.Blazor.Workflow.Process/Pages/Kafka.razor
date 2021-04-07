@@ -1,0 +1,29 @@
+﻿@page "/kafka"
+
+<h3>Kafka</h3>
+<ul>
+    @{ foreach (var message in Messages)
+        {
+            <li>@message</li>
+        }
+    }
+</ul>
+
+@inject IKafkaFactory _kafkaFactory
+
+@code {
+    private List<string> Messages { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Messages = new List<string>();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        _kafkaFactory.CreateConsumer("blazor-ui-consumer", "applicants", Messages);
+    }
+}
