@@ -21,7 +21,7 @@ namespace Kogito.Blazor.Workflow.Process.Factories
 
         public IProducer<Null, string> CreateProducer()
         {
-            var conf = new ProducerConfig { BootstrapServers = "http://" + _baseUrl };
+            var conf = new ProducerConfig { BootstrapServers = _baseUrl };
 
             return new ProducerBuilder<Null, string>(conf).Build();
         }
@@ -56,7 +56,7 @@ namespace Kogito.Blazor.Workflow.Process.Factories
             var conf = new ConsumerConfig
             {
                 GroupId = consumerGroup,
-                BootstrapServers = "http://" + _baseUrl,
+                BootstrapServers = _baseUrl,
                 // Note: The AutoOffsetReset property determines the start offset in the event
                 // there are not yet any committed offsets for the consumer group for the
                 // topic/partitions of interest. By default, offsets are committed
@@ -152,7 +152,7 @@ namespace Kogito.Blazor.Workflow.Process.Factories
             var conf = new ConsumerConfig
             {
                 GroupId = consumerGroup,
-                BootstrapServers = "http://" + _baseUrl,
+                BootstrapServers = _baseUrl,
                 // Note: The AutoOffsetReset property determines the start offset in the event
                 // there are not yet any committed offsets for the consumer group for the
                 // topic/partitions of interest. By default, offsets are committed
