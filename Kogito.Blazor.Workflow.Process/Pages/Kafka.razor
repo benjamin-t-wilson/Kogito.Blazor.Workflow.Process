@@ -1,6 +1,9 @@
 ﻿@page "/kafka"
 
 <h3>Kafka</h3>
+
+<DynamicForm DynamicClass="@NewApplicant" ParentHandleSubmit="@PostNewApplicant" />
+
 <ul>
     @{ foreach (var message in Messages)
         {
@@ -12,18 +15,36 @@
 @inject IKafkaFactory _kafkaFactory
 
 @code {
+    public NewApplicant NewApplicant { get; set; }
     private List<string> Messages { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         Messages = new List<string>();
+        NewApplicant = new NewApplicant();
     }
 
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
 
+        var consumer = new System.Threading.Thread(new System.Threading.ThreadStart(CreateConsumer));
+        consumer.IsBackground = true;
+        consumer.Start();
+    }
+
+    private void PostNewApplicant(NewApplicant newApplicant)
+    {
+        NewApplicant = newApplicant;
+
+        _kafkaFactory.ProduceMessage("applicants", Newtonsoft.Json.JsonConvert.SerializeObject(newApplicant));
+
+        StateHasChanged();
+    }
+
+    private void CreateConsumer()
+    {
         _kafkaFactory.CreateConsumer("blazor-ui-consumer", "applicants", Messages);
     }
 }
