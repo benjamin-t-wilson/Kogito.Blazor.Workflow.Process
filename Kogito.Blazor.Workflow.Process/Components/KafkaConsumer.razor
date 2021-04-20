@@ -1,0 +1,102 @@
+﻿<section class="kafkaConsumer @Topic">
+    <h2>Kafka Consumer for: @Topic</h2>
+    <p>Total messages consumed: @Messages.Count</p>
+    <ul>
+        @{
+            foreach (var msg in Messages)
+            {
+                <li>@msg</li>
+            }
+        }
+    </ul>
+</section>
+
+@inject IKafkaFactory _kafkaFactory
+@inject IConfiguration _config
+
+@code {
+    [Parameter]
+    public string Topic { get; set; }
+
+    public List<string> Messages { get; set; }
+    public string _baseUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (Messages == null)
+        {
+            Messages = new List<string>();
+        }
+
+        _baseUrl = _config.GetValue<string>("Kafka_BaseUrl");
+
+        var consumer = new System.Threading.Thread(new System.Threading.ThreadStart(Testing));
+        consumer.IsBackground = true;
+        consumer.Start();
+    }
+
+    private void CreateConsumer()
+    {
+        _kafkaFactory.CreateConsumer($"blazor-ui-consumer-{Topic}", Topic, Messages);
+    }
+
+    private void UpdateState()
+    {
+        while (true)
+        {
+            Thread.Sleep(5000);
+            Console.WriteLine("Poll updating state at: " + DateTime.Now.TimeOfDay.TotalSeconds);
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async void Testing()
+    {
+        var conf = new ConsumerConfig
+        {
+            GroupId = $"blazor-ui-consumer-{Topic}",
+            BootstrapServers = _baseUrl,
+            // Note: The AutoOffsetReset property determines the start offset in the event
+            // there are not yet any committed offsets for the consumer group for the
+            // topic/partitions of interest. By default, offsets are committed
+            // automatically, so in this example, consumption will only start from the
+            // earliest message in the topic 'my-topic' the first time you run the program.
+            AutoOffsetReset = AutoOffsetReset.Earliest
+        };
+
+        using var c = new ConsumerBuilder<Ignore, string>(conf).Build();
+        c.Subscribe(Topic);
+
+        CancellationTokenSource cts = new CancellationTokenSource();
+        Console.CancelKeyPress += (_, e) =>
+        {
+            e.Cancel = true; // prevent the process from terminating.
+        cts.Cancel();
+        };
+
+        try
+        {
+            while (true)
+            {
+                try
+                {
+                    var cr = c.Consume(cts.Token);
+                    Messages.Add($"Consumed message '{cr.Message.Value}' at: '{cr.TopicPartitionOffset}'.");
+                    Console.WriteLine($"Consumed message '{cr.Message.Value}' at: '{cr.TopicPartitionOffset}'.");
+                    await base.InvokeAsync(base.StateHasChanged);
+                }
+                catch (ConsumeException e)
+                {
+                    Console.WriteLine($"Error occured: {e.Error.Reason}");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Ensure the consumer leaves the group cleanly and final offsets are committed.
+            c.Close();
+        }
+    }
+}

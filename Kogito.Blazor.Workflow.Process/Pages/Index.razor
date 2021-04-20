@@ -12,6 +12,8 @@
 
 <DynamicForm DynamicClass="@NewApplicant" ParentHandleSubmit="@PostNewApplicant" />
 
+<KafkaConsumer Topic="processedapplicants" />
+
 @inject IApplicantRepository _applicantRepository;
 
 @code{
