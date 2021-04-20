@@ -11,7 +11,6 @@
     </ul>
 </section>
 
-@inject IKafkaFactory _kafkaFactory
 @inject IConfiguration _config
 
 @code {
@@ -32,27 +31,12 @@
 
         _baseUrl = _config.GetValue<string>("Kafka_BaseUrl");
 
-        var consumer = new System.Threading.Thread(new System.Threading.ThreadStart(Testing));
+        var consumer = new System.Threading.Thread(new System.Threading.ThreadStart(CreateConsumer));
         consumer.IsBackground = true;
         consumer.Start();
     }
 
-    private void CreateConsumer()
-    {
-        _kafkaFactory.CreateConsumer($"blazor-ui-consumer-{Topic}", Topic, Messages);
-    }
-
-    private void UpdateState()
-    {
-        while (true)
-        {
-            Thread.Sleep(5000);
-            Console.WriteLine("Poll updating state at: " + DateTime.Now.TimeOfDay.TotalSeconds);
-            InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private async void Testing()
+    private async void CreateConsumer()
     {
         var conf = new ConsumerConfig
         {
