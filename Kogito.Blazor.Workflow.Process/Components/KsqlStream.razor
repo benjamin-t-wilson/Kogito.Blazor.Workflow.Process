@@ -1,0 +1,41 @@
+﻿@using Kafka.DotNet.ksqlDB.KSql.Query.Context
+@using Kafka.DotNet.ksqlDB.KSql.RestApi
+@using Kafka.DotNet.ksqlDB.KSql.RestApi.Parameters
+@using Kafka.DotNet.ksqlDB.KSql.RestApi.Serialization
+@using Kafka.DotNet.ksqlDB.KSql.RestApi.Statements
+@using Newtonsoft.Json
+@using System.Text
+@inject IConfiguration config
+
+<h3>KsqlStream</h3>
+<button @onclick="@CreateTable">Create table</button>
+<button @onclick="@QueryTable">Query table</button>
+
+
+@code {
+    private async Task CreateTable()
+    {
+        var httpClientFactory = new HttpClientFactory(new Uri("http://" + config.GetValue<string>("Ksql_BaseUrl")));
+        var restApiClient = new KSqlDbRestApiClient(httpClientFactory);
+
+        var creationMetadata = new EntityCreationMetadata
+        {
+            KafkaTopic = "processedapplicants",
+            ValueFormat = SerializationFormats.Json
+        };
+
+        await restApiClient.CreateStreamAsync<ProcessedApplicant>(creationMetadata);
+    }
+
+    private async Task QueryTable()
+    {
+        var client = new HttpClient();
+        client.BaseAddress = new Uri("http://" + config.GetValue<string>("Ksql_BaseUrl"));
+        
+        var res = await client.PostAsync("/query", new StringContent("{\"ksql\":\"SELECT * FROM processedapplicants;\",\"streamsProperties\":{}}", Encoding.UTF8, "application/json"));
+        var content = await res.Content.ReadAsStringAsync();
+
+        Console.WriteLine(content);
+    }
+
+}
